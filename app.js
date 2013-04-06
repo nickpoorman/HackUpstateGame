@@ -62,29 +62,32 @@ mongoose.connection.on('error', function(err) {
 
 // Passport | config -----------------------------------------------------------
 // dependencies for authentication
-var LocalStrategy = require('passport-local').Strategy;
+var passport = require('passport') , FacebookStrategy = require('passport-facebook').Strategy;
 var User = require('./models/user');
 
-// Define local strategy for Passport
-passport.use(new LocalStrategy({
-  usernameField: "email"
-}, function(email, password, done) {
-  User.authenticate(email, password, function(err, user, info) {
-    done(err, user, info);
-  });
-}));
-
+// Define facebook strategy for Passport
+passport.use(new FacebookStrategy({
+    clientID: "133576740159468",
+    clientSecret: "73e35cc2af835859ce2c1938b4079d0a",
+    callbackURL: "http://www.example.com/auth/facebook/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+      return done(err, user);
+    });
+  }
+));
 // serialize user on login
-passport.serializeUser(function(user, done) {
-  done(null, user.id);
-});
+//passport.serializeUser(function(user, done) {
+//  done(null, user.id);
+//});
 
 // deserialize user on logout / session lookup?
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
-});
+//passport.deserializeUser(function(id, done) {
+//  User.findById(id, function(err, user) {
+//    done(err, user);
+//  });
+//});
 
 // All | config -----------------------------------------------------------
 // config - all environments

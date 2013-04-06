@@ -29,7 +29,8 @@
     "async": ">=0.1.22",
     "traverse": ">=0.6.3",
     "forms": "~0.1.4",
-    "jade": "~0.28.1"
+    "jade": "~0.28.1",
+    "passport-facebook": "~0.1.5"
   },
   "subdomain": "nickpoorman.kingofthehill",
   "domains": [],
