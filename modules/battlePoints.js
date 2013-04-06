@@ -13,10 +13,16 @@ module.exports = function(user1, user2) {
 		}
 	}
 	if (user1 > 0) {
-		return 0;
+		return {
+			winner: 0,
+			remaining: user1
+		};
 	}
 	if (user2 > 0) {
-		return 1;
+		return {
+			winner: 1,
+			remaining: user2
+		};
 	}
 
 };

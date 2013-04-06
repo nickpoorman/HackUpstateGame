@@ -43,7 +43,18 @@ var PointSchema = new Schema({
     time: {
       type: Date
     }
-  }]
+  }],
+  king: {
+    points: {
+      type: Number
+    }
+    // this should prob be in there in the future.... for memoization
+    // ,
+    // user: {
+    //   type: Schema.Types.ObjectId,
+    //   ref: 'User'
+    // }
+  }
 });
 
 PointSchema.pre('save', function(next) {
