@@ -49,30 +49,27 @@ function caputreHill(req, res, next) {
 	}
 
 	// when a user capture's the hill we have to subtract that number of points from the user, ...do upsert and forget
-	User.update({
-		key: 0
-	}, {
-		$inc: {
-			numberOfSubjects: 1
-		}
-	}, {
-		upsert: true
-	}, function(err, numberAffected, raw) {
-		if (err) return console.log(err);
-	});
-
-	// then we have to call the function to determine the person who wins,
-	// then return a message on who won
-
-	User.findOne({}, function(err, point) {
+	user.numberOfSubjects = user.numberOfSubjects - req.param("numPoints");
+	user.save(function(err) {
 		if (err) {
-			return res.json(400, {
-				message: 'DB Error'
-			});
+			if (err.code === 11000) {
+				console.log("some error");
+				return res.send(400);
+			}
+			console.log("[NEED-VALIDATION.signup] " + err);
+			return res.send(400);
 		}
-		return res.json(200, point);
+		// save was successful
+		// then we have to call the function to determine the person who wins,
+		var fauxFunctionCallResult = null;
+		// then return a message on who won
+		// the other guy won
+		if(fauxFunctionCallResult){
+			return req.json({message: "loose"})
+		}
+		// you won
+		return req.json({message: "win"})
 	});
-
 }
 
 function getLeaderboard(req, res, next) {
