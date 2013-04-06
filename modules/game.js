@@ -6,7 +6,7 @@ var forms = require('forms'),
 	validators = forms.validators;
 
 var User = require('../models/user');
-var Point = require('');
+var Point = require('../models/point');
 
 var app = module.exports = express();
 var viewPath = path.resolve(__dirname, '..', 'views');
@@ -19,7 +19,52 @@ app.get('/capture/:userID/:numPoints', caputreHill);
 
 function getNumPoints(req, res, next) {
 	// get => /numPoints/:userID
-	Point.findOne({}, function(err, point) {
+	// load the user
+	if (!user) {
+		return res.json(400, {
+			message: "not authed"
+		});
+	}
+
+	return res.json({
+		numPoints: user.numPoints
+	});
+
+}
+
+function caputreHill(req, res, next) {
+	// post => /checkin/:userID/:numPoints
+
+	// first check to make sure they have the numbe of points they say they need
+	if (!user) {
+		return res.json(400, {
+			message: "not authed"
+		});
+	}
+
+	if (user.numPoints < req.param("numPoints")) {
+		return res.json(400, {
+			message: "insufficient points"
+		});
+	}
+
+	// when a user capture's the hill we have to subtract that number of points from the user, ...do upsert and forget
+	User.update({
+		key: 0
+	}, {
+		$inc: {
+			numberOfSubjects: 1
+		}
+	}, {
+		upsert: true
+	}, function(err, numberAffected, raw) {
+		if (err) return console.log(err);
+	});
+
+	// then we have to call the function to determine the person who wins,
+	// then return a message on who won
+
+	User.findOne({}, function(err, point) {
 		if (err) {
 			return res.json(400, {
 				message: 'DB Error'
@@ -27,10 +72,7 @@ function getNumPoints(req, res, next) {
 		}
 		return res.json(200, point);
 	});
-}
 
-function caputreHill(req, res, next) {
-	// post => /checkin/:userID/:numPoints
 }
 
 function getLeaderboard(req, res, next) {

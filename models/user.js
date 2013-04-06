@@ -81,7 +81,16 @@ var UserSchema = new Schema({
     required: true
   },
   facebookToken: {
-    type: String
+    type: String,
+    index: {
+      unique: true,
+      sparse: true
+    }
+  },
+  //game stuff
+  numPoints: {
+    type: Number,
+    required: true
   }
 });
 

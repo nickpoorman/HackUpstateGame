@@ -25,7 +25,6 @@ var PointSchema = new Schema({
     type: [Number],
     index: '2d'
   }
-  //name
   // in the future this should have a location index to seach on
 
 });
