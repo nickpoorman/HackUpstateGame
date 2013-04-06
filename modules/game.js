@@ -6,7 +6,7 @@ var forms = require('forms'),
 	validators = forms.validators;
 
 var User = require('../models/user');
-//var Point = require('');
+var Point = require('');
 
 var app = module.exports = express();
 var viewPath = path.resolve(__dirname, '..', 'views');
