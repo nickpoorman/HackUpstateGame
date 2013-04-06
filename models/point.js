@@ -8,6 +8,8 @@ var util = require('util');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+var User = require('user');
+
 var passport = require('passport');
 var bcrypt = require('bcrypt');
 var crypto = require('crypto');
@@ -21,12 +23,27 @@ var PointSchema = new Schema({
   updatedAt: {
     type: Date
   },
+  // in the future this should have a location index to seach on
   geo: {
     type: [Number],
     index: '2d'
-  }
-  // in the future this should have a location index to seach on
-
+  },
+  key: {
+    type: Number,
+    index: {
+      unique: true,
+      sparse: true
+    }
+  },
+  captures: [{
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    time: {
+      type: Date
+    }
+  }]
 });
 
 PointSchema.pre('save', function(next) {
