@@ -24,7 +24,7 @@ var clientOption = {};
 /* Only use in production environment */
 if ('production' == app.get('env')) {
   var redis = require('redis');
-  var client = redis.createClient(6379, '.....uri.....');
+  var client = redis.createClient(6379, 'nodejitsudb6896392833.redis.irstack.com');
   client.on("error", function (err) {
         console.log("Error " + err);
     });
@@ -32,7 +32,7 @@ if ('production' == app.get('env')) {
   clientOption = {
       client: client
     };
-  client.auth('....uri.....', function(err) {
+  client.auth('nodejitsudb6896392833.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4', function(err) {
     if (err) {
       throw err;
     }
@@ -49,7 +49,7 @@ var mongoose = require('mongoose');
 //var Schema = mongoose.Schema;
 var uri = "mongodb://localhost/koth"
 if ('production' == app.get('env')) {
-  uri = 'mongodb://....uri.....';
+  uri = 'mongodb://nodejitsu_nickpoorman:3q04aooonejlm0f3u7s8s2vnl6@ds051977.mongolab.com:51977/nodejitsu_nickpoorman_nodejitsudb4365124867';
 }
 //var conn = mongoose.createConnection(uri, {server:{poolSize:2}}); // this doesn't seem to be working
 mongoose.connect(uri);

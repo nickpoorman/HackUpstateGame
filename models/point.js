@@ -21,6 +21,10 @@ var PointSchema = new Schema({
   updatedAt: {
     type: Date
   },
+  geo: {
+    type: [Number],
+    index: '2d'
+  }
   //name
   // in the future this should have a location index to seach on
 
@@ -28,7 +32,7 @@ var PointSchema = new Schema({
 
 PointSchema.pre('save', function(next) {
   this.updatedAt = new Date();
-  if(!this.createdAt) {
+  if (!this.createdAt) {
     this.createdAt = new Date();
   }
   next();

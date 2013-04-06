@@ -5,9 +5,8 @@ var forms = require('forms'),
 	fields = forms.fields,
 	validators = forms.validators;
 
-var email = require('./email');
-
 var User = require('../models/user');
+var Point = require('');
 
 var app = module.exports = express();
 var viewPath = path.resolve(__dirname, '..', 'views');
@@ -20,6 +19,14 @@ app.get('/capture/:userID/:numPoints', caputreHill);
 
 function getNumPoints(req, res, next) {
 	// get => /numPoints/:userID
+	Point.findOne({}, function(err, point) {
+		if (err) {
+			return res.json(400, {
+				message: 'DB Error'
+			});
+		}
+		return res.json(200, point);
+	});
 }
 
 function caputreHill(req, res, next) {
@@ -28,6 +35,7 @@ function caputreHill(req, res, next) {
 
 function getLeaderboard(req, res, next) {
 	// get => /leaderboard
+
 }
 
 
