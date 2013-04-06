@@ -1,0 +1,143 @@
+@navbar-link-spacting: 20px;
+@dark-red: #A91500;
+@border-color: #c4c4c4;
+@border-stuff: 1px solid @border-color;
+
+.border-bottom {
+	border-bottom: @border-stuff;
+}
+
+.extra-padding {
+    padding: 20px;
+}
+
+.content-bg {
+	background-image:url('/assets/img/content-bg.jpg');
+	background-repeat: repeat-x;
+	background-color: #fff;
+}
+
+a {
+	&.logo {
+		float: left;
+		display: block;
+		//padding: 19px 20px 26.5px;
+//		margin-top: ((@navbarHeight - 45px) / 2);
+		margin-top: ((@navbarHeight - 45px) / 2);
+		//margin-left: -20px;
+		margin-right: @navbar-link-spacting;
+		img {
+			width: 170px;
+		}
+	}
+}
+
+.main-nav {
+	.navbar {
+		//padding: ((@navbarHeight - @baseLineHeight)) 20px ((@navbarHeight - @baseLineHeight));
+		.nav {
+			li {
+				a {
+					// float: none;
+					padding: 0;
+					margin: (@navbarHeight - @baseLineHeight - 2em) @navbar-link-spacting 0px;
+					// color: #777777;
+					// text-decoration: none;
+					// text-shadow: 0 1px 0 #ffffff;
+					color: #000000;
+					font-family: Arial;
+					font-size: 10px;
+					font-weight: bold;
+					letter-spacing: 2px;
+					text-transform: uppercase;
+				}
+			}
+		}
+		// fix the last element so it doesn't have any margins 
+		.pull-right {
+			.nav {
+				margin-right: 0;
+				li {
+					&:last-child {
+						a {
+							margin-right: 0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.container {
+	footer {
+		padding-top: 5em;
+		p {
+			color: #cccccc;
+			font-size: 9px;
+			text-transform: uppercase;
+			a {
+				color: #cccccc;
+			}
+		}
+	}
+}
+
+.content-bg {
+	.container {
+		&.white-bg {
+			position: relative;
+			background-color: white;
+			//padding: 20px;
+			&.white-bg-spacer {
+				top: 40px;
+			}
+		}
+	}
+}
+
+.brand {
+	text-transform: uppercase;
+}
+
+.home-page {
+	@import "home.less";
+}
+
+.company-page {
+	@import "company.less";
+}
+
+.legal-notice-page {
+	@import "legal-notice-page.less";
+}
+
+.product-page {
+	@import "product.less";
+}
+
+.contact-page {
+	@import "contact.less";
+}
+
+.auth {
+	font-family: Helvetica, arial, freesans, clean, sans-serif;
+	font-size: 13px;
+	font-style: normal;
+	font-variant: normal;
+	font-weight: bold;
+	letter-spacing: normal;
+	line-height: 18px;
+	.btn {
+		font-family: Helvetica, arial, freesans, clean, sans-serif;
+		font-size: 13px;
+		font-style: normal;
+		font-variant: normal;
+		font-weight: bold;
+		letter-spacing: normal;
+		line-height: 18px;
+	}
+	&.login-page {
+		@import "auth/login.less";
+	}
+}
