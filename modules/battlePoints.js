@@ -1,5 +1,5 @@
 
-var battlePoints = function(user1,user2) {
+module.exports = function(user1,user2) {
 
 
 while (user1 > 0 && user2 > 0) 
@@ -30,8 +30,4 @@ while (user1 > 0 && user2 > 0)
 
 
 };
-
-exports.battlePoints = battlePoints;
-
-
 

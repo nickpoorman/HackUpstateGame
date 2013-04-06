@@ -8,6 +8,8 @@ var forms = require('forms'),
 var User = require('../models/user');
 var Point = require('../models/point');
 
+var battlePoints = require('../models/battlePoints');
+
 var app = module.exports = express();
 var viewPath = path.resolve(__dirname, '..', 'views');
 app.set("views", viewPath);
