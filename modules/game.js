@@ -5,7 +5,6 @@ var forms = require('forms'),
 	fields = forms.fields,
 	validators = forms.validators;
 
-var email = require('./email');
 
 var User = require('../models/user');
 

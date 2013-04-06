@@ -1,6 +1,7 @@
 var test = require('tape');
 var detect = require('../');
-var src = require('./sources/detect.js');
+var fs = require('fs');
+var src = fs.readFileSync(__dirname + '/files/detect.js');
 
 test('check locals and globals', function (t) {
     t.plan(3);

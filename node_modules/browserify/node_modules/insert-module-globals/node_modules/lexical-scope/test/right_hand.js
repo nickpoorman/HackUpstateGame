@@ -1,6 +1,7 @@
 var test = require('tape');
 var detect = require('../');
-var src = require('./sources/right_hand.js');
+var fs = require('fs');
+var src = fs.readFileSync(__dirname + '/files/right_hand.js');
 
 test('globals on the right-hand of assignment', function (t) {
     t.plan(3);

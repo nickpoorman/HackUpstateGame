@@ -1,6 +1,9 @@
 var test = require('tape');
 var detect = require('../');
-var src = '#!/beep/boop blah\n' + require('./sources/detect.js');
+var fs = require('fs');
+var src = '#!/beep/boop blah\n'
+    + fs.readFileSync(__dirname + '/files/detect.js')
+;
 
 test('shebangs', function (t) {
     t.plan(3);
