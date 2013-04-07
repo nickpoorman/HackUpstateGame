@@ -7,6 +7,7 @@ var express = require("express");
 var routes = require("./routes/routes");
 var http = require("http");
 var path = require("path");
+var util = require("util");
 
 var connect = require('connect');
 
@@ -124,22 +125,36 @@ app.use(express.methodOverride());
 // create our own middleare here
 app.use(function(req, res, next) {
   // need to use request to hit the server
-  var accessToken = req.param('access_token')
+  var accessToken = req.param('access_token');
   if (!accessToken) {
+    console.log("no access token");
     return next();
   }
+
   var uri = 'https://graph.facebook.com/me?access_token=' + accessToken;
   request(uri, function(error, response, body) {
+    console.log("body: ");
+    console.log(body);
     if (!error && response.statusCode == 200) {
-      User.findOrCreate(body, function(err, user) {
+      console.log("calling findOrCreate");
+      return User.findOrCreate(JSON.parse(body), function(err, user) {
         if (err) return res.json(400, {
           message: "DB auth error"
         });
         req.user = user;
         req.oAuth = body;
-        next();
+        return next();
       });
     }
+    if (typeof response.error !== "undefined") {
+      // then the user token probably expired
+      return res.json(400, {
+        message: "expired token"
+      });
+    }
+    return res.json(400, {
+      message: "unknown error, probably oAuth"
+    });
   })
 });
 

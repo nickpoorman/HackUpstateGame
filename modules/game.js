@@ -18,6 +18,12 @@ var viewPath = path.resolve(__dirname, '..', 'views');
 app.set("views", viewPath);
 app.set('view engine', 'jade');
 
+app.get('/test', function(req, res, next) {
+  return res.json({
+    message: "working"
+  })
+});
+
 // require auth token
 app.get('/numPoints', getNumPoints);
 
@@ -33,14 +39,14 @@ app.get('/leaderboard', getLeaderboard);
 function getNumPoints(req, res, next) {
   // get => /numPoints/:userID
   // load the user
-  if (!user) {
+  if (!req.user) {
     return res.json(400, {
       message: "not authed"
     });
   }
 
   return res.json({
-    numPoints: user.numPoints
+    numPoints: req.user.numPoints
   });
 }
 
@@ -65,13 +71,13 @@ function caputreHill(req, res, next) {
   // post => /checkin/:userID/:numPoints
 
   // first check to make sure they have the number of points they say they need
-  if (!user) {
+  if (!req.user) {
     return res.json(400, {
       message: "not authed"
     });
   }
 
-  if (user.numPoints < req.param("numPoints")) {
+  if (req.user.numPoints < req.param("numPoints")) {
     return res.json(400, {
       message: "insufficient points"
     });
@@ -79,8 +85,8 @@ function caputreHill(req, res, next) {
 
   // when a user capture's the hill we have to subtract that number of points from the user, ...do upsert and forget
   var yourBattlePoints = req.param("numPoints");
-  user.numPoints = user.numPoints - yourBattlePoints;
-  user.save(function(err) {
+  req.user.numPoints = req.user.numPoints - yourBattlePoints;
+  req.user.save(function(err) {
     if (err) {
       if (err.code === 11000) {
         console.log("some error");
@@ -127,7 +133,7 @@ function caputreHill(req, res, next) {
         // update the record ...push object to hill
         // also set the new king with their remaining points
         point.captures.push({
-          user: user,
+          user: req.user,
           time: new Data()
         });
         point.king.points = lost.remaining;

@@ -21,65 +21,53 @@ var UserSchema = new Schema({
   updatedAt: {
     type: Date
   },
-  email: {
-    type: String,
-    lowercase: true,
-    trim: true,
-    required: true,
-    index: {
-      unique: true
-    }
-  },
-  username: {
-    type: String,
-    trim: true,
-    required: true,
-    index: {
-      unique: true
-    }
-  },
-  salt: {
-    type: String,
-    required: true
-  },
-  pwHash: {
-    type: String,
-    required: true
-  },
-  activated: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
-  confirmationToken: {
-    type: String,
-    index: {
-      unique: true,
-      sparse: true
-    }
-  },
-  passwordResetToken: {
-    type: String,
-    index: {
-      unique: true,
-      sparse: true
-    }
-  },
-  passwordResetTokenCreatedAt: {
-    type: Date
-  },
-  firstName: {
-    type: String,
-    required: true
-  },
-  lastName: {
-    type: String,
-    required: true
-  },
-  picture: {
-    type: String,
-    required: true
-  },
+  // email: {
+  //   type: String,
+  //   lowercase: true,
+  //   trim: true,
+  //   required: true,
+  //   index: {
+  //     unique: true
+  //   }
+  // },
+  // username: {
+  //   type: String,
+  //   trim: true,
+  //   required: true,
+  //   index: {
+  //     unique: true
+  //   }
+  // },
+  // salt: {
+  //   type: String,
+  //   required: true
+  // },
+  // pwHash: {
+  //   type: String,
+  //   required: true
+  // },
+  // activated: {
+  //   type: Boolean,
+  //   default: false,
+  //   required: true
+  // },
+  // confirmationToken: {
+  //   type: String,
+  //   index: {
+  //     unique: true,
+  //     sparse: true
+  //   }
+  // },
+  // passwordResetToken: {
+  //   type: String,
+  //   index: {
+  //     unique: true,
+  //     sparse: true
+  //   }
+  // },
+  // passwordResetTokenCreatedAt: {
+  //   type: Date
+  // },
   facebookId: {
     type: String,
     index: {
@@ -90,7 +78,7 @@ var UserSchema = new Schema({
   //game stuff
   numPoints: {
     type: Number,
-    required: true
+    default: 0
   }
 });
 
@@ -199,21 +187,24 @@ UserSchema.pre('save', function(next) {
 // };
 
 UserSchema.static("findOrCreate", function(doc, callback) {
+  var that = this;
+  console.log("id is: " + doc.id);
   this.findOne({
     facebookId: doc.id
   }, function(err, user) {
     //if (err) return handleError(err);
-
     // may be null if no document matched
     if (user) {
+      console.log("got the user");
       return callback(err, user);
     }
 
+    console.log("did not get the user");
     // if there was no user there create one and return it
-    var user = new User({
-      facebookId: doc.id
-    });
-    user.save(function(err, user) {
+    that.create({facebookId: doc.id}, function(err, user) {
+      console.log("error???: " + err);
+      console.log("user???: " + user);
+      console.log(user);
       return callback(err, user);
     });
   });
