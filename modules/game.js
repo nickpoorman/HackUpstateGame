@@ -188,83 +188,33 @@ function getLeaderboard(req, res, next) {
       return capture.time;
     });
 
-    console.log("sorted: ");
-    console.log(sorted);
-
     // need to go through each of the times and calculate the difference between the time and the next time
     var times = [];
     for (var i = 0; i < sorted.length - 1; i++) {
       var time1 = sorted[i + 1].time;
       var time2 = sorted[i].time;
-      console.log("time1: ");
-      console.log(time1);
-      console.log("time2");
-      console.log(time2);
-      console.log("diff: " + (time1 - time2));
       times.push(time1 - time2);
     }
 
     // finally we need to add the elapsed time between the last element in sorted and the current time
     times.push((Date.now - sorted[sorted.length-1].time));
 
-    // var times = {};
-    // for(var i = 0; i < sorted.length; i++){
-    //   if(times[sorted[i].user]){
-    //     // we already added it so just increment it
-    //     times[sorted[i].user] = times[sorted[i].user] + sorted[i].time;
-    //   }
-    //   times[sorted[i].user] = sorted[i].time;
-    // }
+    var times = {};
+    for(var i = 0; i < sorted.length; i++){
+      if(times[String(sorted[i].user)]){
+        // we already added it so just increment it
+        times[String(sorted[i].user)] = Number(times[String(sorted[i].user)]) + Number(sorted[i].time);
+      }
+      times[String(sorted[i].user)] = sorted[i].time;
+    }
 
-    //var topFive = sorted.reverse().slice(0, 5);
+    var pairs = _.pairs(times);
 
-    // Facebook returns:
-    // {
-    //   "id": "667408125",
-    //   "picture": {
-    //     "data": {
-    //       "url": "http://profile.ak.fbcdn.net/hprofile-ak-ash4/369482_667408125_1764919794_q.jpg",
-    //       "is_silhouette": false
-    //     }
-    //   }
-    // }
+    var pairSort = _.sortBy(caps, function(pair) {
+      return pair[0];
+    });
 
-    // async.map(topFive, function(el, cb) {
-    //   User.findOne({
-    //     _id: el.user
-    //   }, '', {
-    //     lean: true
-    //   }, function(err, user) {
-    //     return cb(err, user);
-    //   });
-    // }, function(err, usersPopulated) {
-    //   return res.json(topFive);
-    // });
+    var topFive = pairSort.reverse().slice(0, 5);
+    return res.json(topFive);
   });
 }
-
-
-// returns: ObjectID of the user
-// function createUser(req, res, next) {
-//   // post => /createUser/:name/:picture
-//   var newUser = new User({
-//     email: req.param("name"),
-//     picture: req.param("picture"),
-//     token: req.param("token")
-//   });
-//   newUser.save(function(err) {
-//     if (err) {
-//       if (err.code === 11000) {
-//         console.log("some error");
-//         return res.send(400);
-//       }
-//       console.log("[NEED-VALIDATION.signup] " + err);
-//       return res.send(400);
-//     }
-//     // save was successful
-//     // now only return back what we want to
-//     return res.json({
-//       message: 'account created'
-//     });
-//   });
-// }

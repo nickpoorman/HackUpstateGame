@@ -4,7 +4,7 @@
   "url": "http://localhost",
   "author": "Nick Poorman <nick@regattable.com>",
   "contributors": [],
-  "version": "0.0.1-8",
+  "version": "0.0.1-9",
   "private": true,
   "dependencies": {
     "express": ">= 3.1.0",
