@@ -30,7 +30,7 @@ app.get('/numPoints', getNumPoints);
 app.get('/getHill', getHill);
 
 // require // auth_token
-app.get('/checkin/:numPoints', caputreHill);
+app.get('/capture/:numPoints', caputreHill);
 
 app.get('/leaderboard', getLeaderboard);
 
@@ -39,6 +39,8 @@ app.get('/leaderboard', getLeaderboard);
 function getNumPoints(req, res, next) {
   // get => /numPoints/:userID
   // load the user
+  console.log("user is: ");
+  console.log(req.user);
   if (!req.user) {
     return res.json(400, {
       message: "not authed"
@@ -68,7 +70,7 @@ function getHill(req, res, next) {
 }
 
 function caputreHill(req, res, next) {
-  // post => /checkin/:userID/:numPoints
+  // post => /capture/:userID/:numPoints
 
   // first check to make sure they have the number of points they say they need
   if (!req.user) {
@@ -113,13 +115,19 @@ function caputreHill(req, res, next) {
       // get the king on the hill now
       var king = point.king;
       // if the king has no points then you win!
+      // if you are the king, then add the points
+      if (typeof king !== "undefined" && typeof king.user !== "undefined" && String(king.user) === String(req.user._id)) {
+        // you are the user
+        console.log("you are already the king");
+        yourBattlePoints = Number(yourBattlePoints) + Number(king.points);
+      }
       var lost = {
         winner: 0,
         remaining: yourBattlePoints
       };
       var message = "win";
 
-      if (typeof king !== "undefined" && king.points) {
+      if (typeof king !== "undefined" && typeof king.user !== "undefined" && String(king.user) !== String(req.user._id) && king.points) {
         // once we have the king, then battle him against you with the number of battle points you submitted
         // lost will be 0 if you win, or 1 if you lost
         lost = battlePoints(yourBattlePoints, king.points);
@@ -134,15 +142,18 @@ function caputreHill(req, res, next) {
         // also set the new king with their remaining points
         point.captures.push({
           user: req.user,
-          time: new Data()
+          time: new Date(),
+          facebookId: req.user.facebookId
         });
+        point.king = {};
         point.king.points = lost.remaining;
+        point.king.user = req.user;
 
         point.save(function(err) {
           if (err) {
             return res.json(400, "DB ERROR");
           }
-          return req.json({
+          return res.json({
             message: message,
             postBattlePoints: lost.remaining
           });
@@ -154,33 +165,106 @@ function caputreHill(req, res, next) {
 
 function getLeaderboard(req, res, next) {
   // get => /leaderboard
+  // [{
+  //   elapsedTime: asfsdf,
+  //   name: asdfasdf ,
+  //   picture: adsfadsf,
+  //   king: asdfasd
+  // }]
   // this should return an object of all the users on the hill
-  return res.json(200);
-}
-
-
-// returns: ObjectID of the user - this needs to be stored on client, because it will be passed back?
-
-function createUser(req, res, next) {
-  // post => /createUser/:name/:picture
-  var newUser = new User({
-    email: req.param("name"),
-    picture: req.param("picture"),
-    token: req.param("token")
-  });
-  newUser.save(function(err) {
+  Point.findOne({
+    key: 0
+  }, function(err, point) {
     if (err) {
-      if (err.code === 11000) {
-        console.log("some error");
-        return res.send(400);
-      }
-      console.log("[NEED-VALIDATION.signup] " + err);
-      return res.send(400);
+      return res.json(400, {
+        message: "could not find hill"
+      });
     }
-    // save was successful
-    // now only return back what we want to
-    return res.json({
-      message: 'account created'
+
+    // need to get the total time each person has captured the hill for
+    // first get the array and sort them by time
+    var caps = point.captures;
+    var sorted = _.sortBy(caps, function(capture) {
+      return capture.time;
     });
+
+    console.log("sorted: ");
+    console.log(sorted);
+
+    // need to go through each of the times and calculate the difference between the time and the next time
+    var times = [];
+    for (var i = 0; i < sorted.length - 1; i++) {
+      var time1 = sorted[i + 1].time;
+      var time2 = sorted[i].time;
+      console.log("time1: ");
+      console.log(time1);
+      console.log("time2");
+      console.log(time2);
+      console.log("diff: " + (time1 - time2));
+      times.push(time1 - time2);
+    }
+
+    // finally we need to add the elapsed time between the last element in sorted and the current time
+    times.push((Date.now - sorted[sorted.length-1].time));
+
+    // var times = {};
+    // for(var i = 0; i < sorted.length; i++){
+    //   if(times[sorted[i].user]){
+    //     // we already added it so just increment it
+    //     times[sorted[i].user] = times[sorted[i].user] + sorted[i].time;
+    //   }
+    //   times[sorted[i].user] = sorted[i].time;
+    // }
+
+    //var topFive = sorted.reverse().slice(0, 5);
+
+    // Facebook returns:
+    // {
+    //   "id": "667408125",
+    //   "picture": {
+    //     "data": {
+    //       "url": "http://profile.ak.fbcdn.net/hprofile-ak-ash4/369482_667408125_1764919794_q.jpg",
+    //       "is_silhouette": false
+    //     }
+    //   }
+    // }
+
+    // async.map(topFive, function(el, cb) {
+    //   User.findOne({
+    //     _id: el.user
+    //   }, '', {
+    //     lean: true
+    //   }, function(err, user) {
+    //     return cb(err, user);
+    //   });
+    // }, function(err, usersPopulated) {
+    //   return res.json(topFive);
+    // });
   });
 }
+
+
+// returns: ObjectID of the user
+// function createUser(req, res, next) {
+//   // post => /createUser/:name/:picture
+//   var newUser = new User({
+//     email: req.param("name"),
+//     picture: req.param("picture"),
+//     token: req.param("token")
+//   });
+//   newUser.save(function(err) {
+//     if (err) {
+//       if (err.code === 11000) {
+//         console.log("some error");
+//         return res.send(400);
+//       }
+//       console.log("[NEED-VALIDATION.signup] " + err);
+//       return res.send(400);
+//     }
+//     // save was successful
+//     // now only return back what we want to
+//     return res.json({
+//       message: 'account created'
+//     });
+//   });
+// }

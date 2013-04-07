@@ -47,13 +47,12 @@ var PointSchema = new Schema({
   king: {
     points: {
       type: Number
-    }
+    },
     // this should prob be in there in the future.... for memoization
-    // ,
-    // user: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: 'User'
-    // }
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
   }
 });
 

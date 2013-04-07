@@ -127,16 +127,16 @@ app.use(function(req, res, next) {
   // need to use request to hit the server
   var accessToken = req.param('access_token');
   if (!accessToken) {
-    console.log("no access token");
+    //console.log("no access token");
     return next();
   }
 
   var uri = 'https://graph.facebook.com/me?access_token=' + accessToken;
   request(uri, function(error, response, body) {
-    console.log("body: ");
-    console.log(body);
+    // console.log("body: ");
+    // console.log(body);
     if (!error && response.statusCode == 200) {
-      console.log("calling findOrCreate");
+      // console.log("calling findOrCreate");
       return User.findOrCreate(JSON.parse(body), function(err, user) {
         if (err) return res.json(400, {
           message: "DB auth error"
