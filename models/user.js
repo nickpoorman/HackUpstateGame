@@ -69,7 +69,7 @@ var UserSchema = new Schema({
   //   type: Date
   // },
   facebookId: {
-    type: String,
+    type: Number,
     index: {
       unique: true,
       sparse: true
@@ -188,11 +188,15 @@ UserSchema.pre('save', function(next) {
 
 UserSchema.static("findOrCreate", function(doc, callback) {
   var that = this;
+  console.log("facebookId: ");
+  console.log(doc.id);
   this.findOne({
     facebookId: doc.id
   }, function(err, user) {
     //if (err) return handleError(err);
     // may be null if no document matched
+    console.log("user is: ");
+     console.log(user);
     if (user) {
       return callback(err, user);
     }

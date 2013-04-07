@@ -133,11 +133,15 @@ app.use(function(req, res, next) {
 
   var uri = 'https://graph.facebook.com/me?access_token=' + accessToken;
   request(uri, function(error, response, body) {
-    // console.log("body: ");
-    // console.log(body);
+    console.log("body: ");
+    console.log(body);
     if (!error && response.statusCode == 200) {
       // console.log("calling findOrCreate");
       return User.findOrCreate(JSON.parse(body), function(err, user) {
+        console.log("error is: ");
+        console.log(err);
+        console.log("user is: ");
+        console.log(user);
         if (err) return res.json(400, {
           message: "DB auth error"
         });
