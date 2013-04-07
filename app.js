@@ -13,6 +13,8 @@ var connect = require('connect');
 var passport = require('passport');
 var mongoose = require('mongoose');
 
+var request = require('request');
+
 // node-validator
 var expressValidator = require('express-validator');
 
@@ -22,27 +24,27 @@ var app = module.exports = express();
 // Session store | Redis --------------------------------------------------------
 var clientOption = {};
 /* Only use in production environment */
-if ('production' == app.get('env')) {
-  var redis = require('redis');
-  var client = redis.createClient(6379, 'nodejitsudb6896392833.redis.irstack.com');
-  client.on("error", function (err) {
-        console.log("Error " + err);
-    });
+// if ('production' == app.get('env')) {
+//   var redis = require('redis');
+//   var client = redis.createClient(6379, 'nodejitsudb6896392833.redis.irstack.com');
+//   client.on("error", function (err) {
+//         console.log("Error " + err);
+//     });
 
-  clientOption = {
-      client: client
-    };
-  client.auth('nodejitsudb6896392833.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4', function(err) {
-    if (err) {
-      throw err;
-    }
-    // You are now connected to your redis.
-    console.log("connected to redis");
-  });
-}
+//   clientOption = {
+//       client: client
+//     };
+//   client.auth('nodejitsudb6896392833.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4', function(err) {
+//     if (err) {
+//       throw err;
+//     }
+//     // You are now connected to your redis.
+//     console.log("connected to redis");
+//   });
+// }
 
-var RedisStore = require('connect-redis')(express);
-var sessionStore = new RedisStore(clientOption);
+// var RedisStore = require('connect-redis')(express);
+// var sessionStore = new RedisStore(clientOption);
 
 // Database | MongoDB -----------------------------------------------------------
 var mongoose = require('mongoose');
@@ -62,21 +64,21 @@ mongoose.connection.on('error', function(err) {
 
 // Passport | config -----------------------------------------------------------
 // dependencies for authentication
-var passport = require('passport') , FacebookStrategy = require('passport-facebook').Strategy;
+// var passport = require('passport') , FacebookStrategy = require('passport-facebook').Strategy;
 var User = require('./models/user');
 
 // Define facebook strategy for Passport
-passport.use(new FacebookStrategy({
-    clientID: "133576740159468",
-    clientSecret: "73e35cc2af835859ce2c1938b4079d0a",
-    callbackURL: "http://www.example.com/auth/facebook/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
-    User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-      return done(err, user);
-    });
-  }
-));
+// passport.use(new FacebookStrategy({
+//     clientID: "133576740159468",
+//     clientSecret: "73e35cc2af835859ce2c1938b4079d0a",
+//     callbackURL: "http://www.example.com/auth/facebook/callback"
+//   },
+//   function(accessToken, refreshToken, profile, done) {
+//     User.findOrCreate({ facebookId: profile.id }, function (err, user) {
+//       return done(err, user);
+//     });
+//   }
+// ));
 // serialize user on login
 //passport.serializeUser(function(user, done) {
 //  done(null, user.id);
@@ -112,13 +114,35 @@ app.use(express.cookieParser("acookienonce"));
 app.use(express.bodyParser());
 app.use(expressValidator);
 app.use(express.methodOverride());
-app.use(express.session({
- store: sessionStore
-}));
+// app.use(express.session({
+//  store: sessionStore
+// }));
 // Initialize Passport!  Also use passport.session() middleware, to support
 // persistent login sessions.
-app.use(passport.initialize());
-app.use(passport.session());
+// app.use(passport.initialize());
+// app.use(passport.session());
+// create our own middleare here
+app.use(function(req, res, next) {
+  // need to use request to hit the server
+  var accessToken = req.param('access_token')
+  if (!accessToken) {
+    return next();
+  }
+  var uri = 'https://graph.facebook.com/me?access_token=' + accessToken;
+  request(uri, function(error, response, body) {
+    if (!error && response.statusCode == 200) {
+      User.findOrCreate(body, function(err, user) {
+        if (err) return res.json(400, {
+          message: "DB auth error"
+        });
+        req.user = user;
+        req.oAuth = body;
+        next();
+      });
+    }
+  })
+});
+
 app.use(function(req, res, next) {
   res.locals.user = req.user;
   res.locals.session = req.session;

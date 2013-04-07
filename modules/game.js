@@ -6,22 +6,25 @@ var forms = require('forms'),
   validators = forms.validators;
 
 var _ = require('underscore');
+var passport = require("passport");
 
 var User = require('../models/user');
 var Point = require('../models/point');
 
-var battlePoints = require('../models/battlePoints');
+var battlePoints = require('./battlePoints');
 
 var app = module.exports = express();
 var viewPath = path.resolve(__dirname, '..', 'views');
 app.set("views", viewPath);
 app.set('view engine', 'jade');
 
-app.get('/numPoints/:userID', getNumPoints);
+// require auth token
+app.get('/numPoints', getNumPoints);
 
 app.get('/getHill', getHill);
 
-app.get('/checkin/:userID/:numPoints', caputreHill);
+// require // auth_token
+app.get('/checkin/:numPoints', caputreHill);
 
 app.get('/leaderboard', getLeaderboard);
 
@@ -52,7 +55,9 @@ function getHill(req, res, next) {
         message: "could not find hill"
       });
     }
-    return res.json({cord: point.geo});
+    return res.json({
+      cord: point.geo
+    });
   });
 }
 
@@ -127,13 +132,15 @@ function caputreHill(req, res, next) {
         });
         point.king.points = lost.remaining;
 
-        point.save(function(err)) {
-          if (err) return res.json(400, "DB ERROR");
+        point.save(function(err) {
+          if (err) {
+            return res.json(400, "DB ERROR");
+          }
           return req.json({
             message: message,
             postBattlePoints: lost.remaining
           });
-        }
+        });
       }
     });
   });
@@ -142,7 +149,7 @@ function caputreHill(req, res, next) {
 function getLeaderboard(req, res, next) {
   // get => /leaderboard
   // this should return an object of all the users on the hill
-
+  return res.json(200);
 }
 
 

@@ -8,7 +8,7 @@ var util = require('util');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var User = require('user');
+var User = require('./user');
 
 var passport = require('passport');
 var bcrypt = require('bcrypt');
